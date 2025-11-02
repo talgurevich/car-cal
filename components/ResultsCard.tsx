@@ -150,12 +150,6 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
               <span className="text-gray-600">ערך הרכב אחרי ירידת ערך:</span>
               <span className="font-semibold text-blue-600">+{formatCurrency(results.residualValue)}</span>
             </div>
-            <div className="flex justify-between pt-2 border-t-2 border-gray-300">
-              <span className="font-bold">תוצאה נטו:</span>
-              <span className={`font-bold text-lg ${results.netBenefit > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(results.netBenefit)}
-              </span>
-            </div>
           </div>
         </div>
 
