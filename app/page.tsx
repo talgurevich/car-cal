@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import * as XLSX from "xlsx";
+import { jsPDF } from "jspdf";
 import ScenarioForm from "@/components/ScenarioForm";
 import ResultsCard from "@/components/ResultsCard";
 import CalculationHistory from "@/components/CalculationHistory";
-import { ScenarioInput, calculateScenario, CalculationResult } from "@/lib/formulas";
+import { ScenarioInput, calculateScenario, CalculationResult, formatCurrency } from "@/lib/formulas";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
-import { Save, Download, Upload, BookOpen } from "lucide-react";
+import { Save, Download, Upload, BookOpen, FileSpreadsheet, FileText } from "lucide-react";
 
 interface HistoryItem {
   scenario: ScenarioInput;
@@ -118,16 +120,252 @@ export default function Home() {
 
   const handleExport = () => {
     if (results) {
-      const dataStr = JSON.stringify(results, null, 2);
-      const dataBlob = new Blob([dataStr], { type: "application/json" });
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `car-calculation-${results.scenario.name}-${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
-      toast.success("התוצאות יוצאו!", {
-        icon: "📥",
+      const { scenario, calculation } = results;
+
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+
+      // Input Data Sheet
+      const inputData = [
+        ["מחשבון השוואת עלויות רכב", ""],
+        ["", ""],
+        ["פרטי התרחיש", ""],
+        ["שם התרחיש", scenario.name],
+        ["שנתון", scenario.year],
+        ["סוג רכב", scenario.powertrain === "electric" ? "חשמלי" : scenario.powertrain === "hybrid" ? "היברידי" : "בנזין"],
+        ["מחיר הרכב", formatCurrency(scenario.price)],
+        ["", ""],
+        ["פרטי מימון", ""],
+        ["תקופת מימון (שנים)", scenario.financeYears],
+        ["ריבית שנתית", `${(scenario.apr * 100).toFixed(2)}%`],
+        ["", ""],
+        ["שימוש ועלויות", ""],
+        ["ק״מ שנתי", scenario.annualKm.toLocaleString()],
+        ["תחזוקה חודשית", formatCurrency(scenario.monthlyMaint)],
+        ["ביטוח חודשי", formatCurrency(scenario.monthlyInsurance)],
+        ["", ""],
+        ["מסים", ""],
+        ["תוספת מעסיק ברוטו", formatCurrency(scenario.employerAllowance)],
+        ["מדרגת מס", `${(scenario.taxBracket * 100).toFixed(0)}%`],
+        ["ביטוח לאומי", `${(scenario.nationalInsurance * 100).toFixed(1)}%`],
+        ["מס בריאות", `${(scenario.healthTax * 100).toFixed(1)}%`],
+        ["", ""],
+        ["תקופת ניתוח", ""],
+        ["תקופת ניתוח (שנים)", scenario.horizonYears],
+        ["ערך הרכב אחרי ירידת ערך", `${scenario.residualPct}%`],
+      ];
+
+      // Personal Car Results Sheet
+      const personalCarData = [
+        ["תוצאות - רכב אישי", ""],
+        ["", ""],
+        ["תוספת ברוטו חודשית", formatCurrency(scenario.employerAllowance)],
+        [`מס הכנסה (${(scenario.taxBracket * 100).toFixed(0)}%)`, `-${formatCurrency(scenario.employerAllowance * scenario.taxBracket)}`],
+        [`ביטוח לאומי (${(scenario.nationalInsurance * 100).toFixed(1)}%)`, `-${formatCurrency(scenario.employerAllowance * scenario.nationalInsurance)}`],
+        [`מס בריאות (${(scenario.healthTax * 100).toFixed(1)}%)`, `-${formatCurrency(scenario.employerAllowance * scenario.healthTax)}`],
+        ["תוספת נטו חודשית", formatCurrency(calculation.monthlyAllowanceNet)],
+        ["", ""],
+        ["עלויות חודשיות", ""],
+        ["תשלום להלוואה", formatCurrency(calculation.monthlyPayment)],
+        ["אנרגיה", formatCurrency(calculation.monthlyEnergy)],
+        ["תחזוקה", formatCurrency(scenario.monthlyMaint)],
+        ["ביטוח", formatCurrency(scenario.monthlyInsurance)],
+        ["סה״כ עלות חודשית", formatCurrency(calculation.monthlyTotal)],
+        ["", ""],
+        ["סיכום", ""],
+        ["תוספת נטו כוללת", formatCurrency(calculation.totalAllowanceNet)],
+        ["סה״כ עלויות", `-${formatCurrency(calculation.monthlyTotal * calculation.totalMonths)}`],
+        ["ערך הרכב אחרי ירידת ערך", formatCurrency(calculation.residualValue)],
+        ["תוצאה נטו", formatCurrency(calculation.netBenefit)],
+      ];
+
+      // Company Car Results Sheet
+      const companyCarData = [
+        ["תוצאות - רכב חברה", ""],
+        ["", ""],
+        ["שווי שימוש חודשי", formatCurrency(calculation.companyCar.monthlyTaxableValue)],
+        ["עלות מס חודשית", formatCurrency(calculation.companyCar.monthlyTaxCost)],
+        ["", ""],
+        ["סיכום", ""],
+        ["סה״כ עלות מס", formatCurrency(calculation.companyCar.totalTaxCost)],
+        ["עלות נטו", formatCurrency(calculation.companyCar.netCost)],
+      ];
+
+      // Comparison Sheet
+      const comparisonData = [
+        ["השוואה", ""],
+        ["", ""],
+        ["הפרש (אישי מול חברה)", formatCurrency(calculation.comparison.difference)],
+        ["הפרש חודשי ממוצע", formatCurrency(calculation.comparison.monthlyDifference)],
+        ["אפשרות טובה יותר", calculation.comparison.betterOption === "personal" ? "רכב אישי" : "רכב חברה"],
+      ];
+
+      // Add sheets to workbook
+      const wsInput = XLSX.utils.aoa_to_sheet(inputData);
+      const wsPersonal = XLSX.utils.aoa_to_sheet(personalCarData);
+      const wsCompany = XLSX.utils.aoa_to_sheet(companyCarData);
+      const wsComparison = XLSX.utils.aoa_to_sheet(comparisonData);
+
+      XLSX.utils.book_append_sheet(wb, wsInput, "נתוני קלט");
+      XLSX.utils.book_append_sheet(wb, wsPersonal, "רכב אישי");
+      XLSX.utils.book_append_sheet(wb, wsCompany, "רכב חברה");
+      XLSX.utils.book_append_sheet(wb, wsComparison, "השוואה");
+
+      // Generate Excel file
+      const fileName = `חישוב-רכב-${scenario.name}-${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+
+      toast.success("קובץ Excel הורד בהצלחה!", {
+        icon: "📊",
+        duration: 2000,
+      });
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (results) {
+      const { scenario, calculation } = results;
+
+      const doc = new jsPDF();
+
+      // Set font for Hebrew support (using built-in font)
+      let yPos = 20;
+      const lineHeight = 7;
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+      // Title
+      doc.setFontSize(16);
+      doc.text("Car Calculator - ", pageWidth / 2, yPos, { align: "center" });
+      yPos += lineHeight * 2;
+
+      // Scenario Name
+      doc.setFontSize(14);
+      doc.text(`Scenario: ${scenario.name}`, 20, yPos);
+      yPos += lineHeight * 2;
+
+      // Input Data Section
+      doc.setFontSize(12);
+      doc.setFont(undefined, "bold");
+      doc.text("Input Data", 20, yPos);
+      yPos += lineHeight;
+      doc.setFont(undefined, "normal");
+      doc.setFontSize(10);
+
+      const inputLines = [
+        `Year: ${scenario.year}`,
+        `Type: ${scenario.powertrain === "electric" ? "Electric" : scenario.powertrain === "hybrid" ? "Hybrid" : "Gasoline"}`,
+        `Price: ${formatCurrency(scenario.price)}`,
+        `Financing Years: ${scenario.financeYears}`,
+        `APR: ${(scenario.apr * 100).toFixed(2)}%`,
+        `Annual KM: ${scenario.annualKm.toLocaleString()}`,
+        `Monthly Maintenance: ${formatCurrency(scenario.monthlyMaint)}`,
+        `Monthly Insurance: ${formatCurrency(scenario.monthlyInsurance)}`,
+        `Employer Allowance: ${formatCurrency(scenario.employerAllowance)}`,
+        `Tax Bracket: ${(scenario.taxBracket * 100).toFixed(0)}%`,
+        `National Insurance: ${(scenario.nationalInsurance * 100).toFixed(1)}%`,
+        `Health Tax: ${(scenario.healthTax * 100).toFixed(1)}%`,
+        `Analysis Period: ${scenario.horizonYears} years`,
+        `Residual Value: ${scenario.residualPct}%`,
+      ];
+
+      inputLines.forEach((line) => {
+        doc.text(line, 25, yPos);
+        yPos += lineHeight;
+      });
+
+      yPos += lineHeight;
+
+      // Personal Car Results
+      doc.setFontSize(12);
+      doc.setFont(undefined, "bold");
+      doc.text("Personal Car Results", 20, yPos);
+      yPos += lineHeight;
+      doc.setFont(undefined, "normal");
+      doc.setFontSize(10);
+
+      const personalLines = [
+        `Gross Monthly Allowance: ${formatCurrency(scenario.employerAllowance)}`,
+        `Income Tax: -${formatCurrency(scenario.employerAllowance * scenario.taxBracket)}`,
+        `National Insurance: -${formatCurrency(scenario.employerAllowance * scenario.nationalInsurance)}`,
+        `Health Tax: -${formatCurrency(scenario.employerAllowance * scenario.healthTax)}`,
+        `Net Monthly Allowance: ${formatCurrency(calculation.monthlyAllowanceNet)}`,
+        ``,
+        `Monthly Costs:`,
+        `  Loan Payment: ${formatCurrency(calculation.monthlyPayment)}`,
+        `  Energy: ${formatCurrency(calculation.monthlyEnergy)}`,
+        `  Maintenance: ${formatCurrency(scenario.monthlyMaint)}`,
+        `  Insurance: ${formatCurrency(scenario.monthlyInsurance)}`,
+        `  Total Monthly Cost: ${formatCurrency(calculation.monthlyTotal)}`,
+        ``,
+        `Total Net Allowance: ${formatCurrency(calculation.totalAllowanceNet)}`,
+        `Total Costs: -${formatCurrency(calculation.monthlyTotal * calculation.totalMonths)}`,
+        `Residual Value: ${formatCurrency(calculation.residualValue)}`,
+        `Net Benefit: ${formatCurrency(calculation.netBenefit)}`,
+      ];
+
+      personalLines.forEach((line) => {
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+        doc.text(line, 25, yPos);
+        yPos += lineHeight;
+      });
+
+      yPos += lineHeight;
+
+      // Company Car Results
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      doc.setFontSize(12);
+      doc.setFont(undefined, "bold");
+      doc.text("Company Car Results", 20, yPos);
+      yPos += lineHeight;
+      doc.setFont(undefined, "normal");
+      doc.setFontSize(10);
+
+      const companyLines = [
+        `Monthly Taxable Value: ${formatCurrency(calculation.companyCar.monthlyTaxableValue)}`,
+        `Monthly Tax Cost: ${formatCurrency(calculation.companyCar.monthlyTaxCost)}`,
+        `Total Tax Cost: ${formatCurrency(calculation.companyCar.totalTaxCost)}`,
+        `Net Cost: ${formatCurrency(calculation.companyCar.netCost)}`,
+      ];
+
+      companyLines.forEach((line) => {
+        doc.text(line, 25, yPos);
+        yPos += lineHeight;
+      });
+
+      yPos += lineHeight * 2;
+
+      // Comparison
+      doc.setFontSize(12);
+      doc.setFont(undefined, "bold");
+      doc.text("Comparison", 20, yPos);
+      yPos += lineHeight;
+      doc.setFont(undefined, "normal");
+      doc.setFontSize(10);
+
+      const comparisonLines = [
+        `Difference: ${formatCurrency(calculation.comparison.difference)}`,
+        `Monthly Average Difference: ${formatCurrency(calculation.comparison.monthlyDifference)}`,
+        `Better Option: ${calculation.comparison.betterOption === "personal" ? "Personal Car" : "Company Car"}`,
+      ];
+
+      comparisonLines.forEach((line) => {
+        doc.text(line, 25, yPos);
+        yPos += lineHeight;
+      });
+
+      // Save PDF
+      const fileName = `car-calculation-${scenario.name}-${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+
+      toast.success("PDF הורד בהצלחה!", {
+        icon: "📄",
         duration: 2000,
       });
     }
@@ -212,10 +450,19 @@ export default function Home() {
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleExport}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
-                <Download size={20} />
-                <span className="font-medium">ייצא תוצאות</span>
+                <FileSpreadsheet size={20} />
+                <span className="font-medium">ייצא Excel</span>
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleExportPDF}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+              >
+                <FileText size={20} />
+                <span className="font-medium">ייצא PDF</span>
               </motion.button>
             </motion.div>
           )}
