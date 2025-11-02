@@ -382,7 +382,7 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              ערך שיורי %
+              ערך הרכב אחרי ירידת ערך %
               <Tooltip text="ערך המכירה החזוי של הרכב כאחוז ממחיר הרכישה לאחר תקופת הניתוח. בדרך כלל 30-50% לאחר 3-5 שנים." />
             </label>
             <input

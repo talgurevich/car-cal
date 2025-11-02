@@ -34,7 +34,7 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
       fill: "#EF4444",
     },
     {
-      name: "ערך שיורי",
+      name: "ערך הרכב אחרי ירידת ערך",
       amount: results.residualValue,
       fill: "#3B82F6",
     },
@@ -147,7 +147,7 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
               <span className="font-semibold text-green-700">+{formatCurrency(results.monthlyAllowanceNet + results.companyCar.monthlyTaxCost)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">ערך שיורי:</span>
+              <span className="text-gray-600">ערך הרכב אחרי ירידת ערך:</span>
               <span className="font-semibold text-blue-600">+{formatCurrency(results.residualValue)}</span>
             </div>
             <div className="flex justify-between pt-2 border-t-2 border-gray-300">
@@ -368,7 +368,7 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="text-gray-600 text-sm">ערך שיורי ({scenario.residualPct}%)</span>
+            <span className="text-gray-600 text-sm">ערך הרכב אחרי ירידת ערך ({scenario.residualPct}%)</span>
             <span className="font-semibold text-blue-700">{formatCurrency(results.residualValue)}</span>
           </div>
         </div>
