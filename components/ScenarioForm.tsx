@@ -200,7 +200,9 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mr-10">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">מחיר (₪)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              מחיר (₪) <span className="text-red-500">*</span>
+            </label>
             <input
               type="number"
               {...register("price", { required: true, valueAsNumber: true })}
@@ -209,7 +211,9 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">משך המימון (שנים)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              משך המימון (שנים) <span className="text-red-500">*</span>
+            </label>
             <input
               type="number"
               {...register("financeYears", { required: true, valueAsNumber: true })}
@@ -243,7 +247,9 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mr-10">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">קילומטרים שנתיים</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              קילומטרים שנתיים <span className="text-red-500">*</span>
+            </label>
             <input
               type="number"
               {...register("annualKm", { required: true, valueAsNumber: true })}
@@ -354,7 +360,7 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mr-10">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              אחזקה חודשית (₪)
+              אחזקה חודשית (₪) <span className="text-red-500">*</span>
               <Tooltip text={`עלות אחזקה חודשית משוערת בהתאם לגיל הרכב (${new Date().getFullYear() - (year || new Date().getFullYear())} שנים), סוג המנוע, ומחיר הרכב. רכבים חשמליים זולים יותר לתחזוקה, רכבים ישנים יותר יקרים יותר.`} />
             </label>
             <input
@@ -372,7 +378,9 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">ביטוח ורישוי חודשי (₪)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              ביטוח ורישוי חודשי (₪) <span className="text-red-500">*</span>
+            </label>
             <input
               type="number"
               {...register("monthlyInsurance", { required: true, valueAsNumber: true })}
@@ -382,7 +390,7 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              ערך הרכב אחרי ירידת ערך %
+              ערך הרכב אחרי ירידת ערך % <span className="text-red-500">*</span>
               <Tooltip text="ערך המכירה החזוי של הרכב כאחוז ממחיר הרכישה לאחר תקופת הניתוח. בדרך כלל 30-50% לאחר 3-5 שנים." />
             </label>
             <input
