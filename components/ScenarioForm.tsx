@@ -69,7 +69,7 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
       residualPct: defaultValues?.residualPct ?? undefined,
       employerAllowance: defaultValues?.employerAllowance ?? 3000,
       horizonYears: defaultValues?.horizonYears ?? 3,
-      taxBracket: defaultValues?.taxBracket ?? 0.47,
+      taxBracket: defaultValues?.taxBracket ?? 0.35,
       nationalInsurance: defaultValues?.nationalInsurance ?? 0.07,
       healthTax: defaultValues?.healthTax ?? 0.05,
       companyCarTaxableValue: defaultValues?.companyCarTaxableValue,
@@ -415,7 +415,7 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
               מדרגת מס הכנסה שולית
-              <Tooltip text="המדרגה השולית של מס הכנסה בלבד (לא כולל ביטוח לאומי ומס בריאות). מדרגות המס בישראל: 10%, 14%, 20%, 31%, 35%, 47%, 50%." />
+              <Tooltip text="המדרגה השולית של מס הכנסה בלבד (לא כולל ביטוח לאומי ומס בריאות). מדרגות המס בישראל: 10%, 14%, 20%, 31%, 35%, 41%, 47%, 50%." />
             </label>
             <select
               {...register("taxBracket", { required: true, valueAsNumber: true })}
@@ -425,9 +425,10 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
               <option value={0.14}>14% - מדרגה שנייה</option>
               <option value={0.20}>20% - מדרגה שלישית</option>
               <option value={0.31}>31% - מדרגה רביעית</option>
-              <option value={0.35}>35% - מדרגה חמישית</option>
-              <option value={0.47}>47% - מדרגה שישית (ברירת מחדל)</option>
-              <option value={0.50}>50% - מדרגה שביעית</option>
+              <option value={0.35}>35% - מדרגה חמישית (ברירת מחדל)</option>
+              <option value={0.41}>41% - מדרגה שישית</option>
+              <option value={0.47}>47% - מדרגה שביעית</option>
+              <option value={0.50}>50% - מדרגה שמינית</option>
             </select>
           </div>
 
@@ -441,11 +442,11 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
               type="number"
               step="0.001"
               {...register("nationalInsurance", { required: true, valueAsNumber: true })}
-              placeholder={`מומלץ: ${(getSuggestedNationalInsurance(taxBracket || 0.47) * 100).toFixed(1)}%`}
+              placeholder={`מומלץ: ${(getSuggestedNationalInsurance(taxBracket || 0.35) * 100).toFixed(1)}%`}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder:text-gray-400"
             />
             <p className="text-xs text-gray-500 mt-1">
-              מומלץ: {(getSuggestedNationalInsurance(taxBracket || 0.47) * 100).toFixed(1)}% לפי מדרגת המס
+              מומלץ: {(getSuggestedNationalInsurance(taxBracket || 0.35) * 100).toFixed(1)}% לפי מדרגת המס
             </p>
           </div>
 
@@ -459,11 +460,11 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
               type="number"
               step="0.001"
               {...register("healthTax", { required: true, valueAsNumber: true })}
-              placeholder={`מומלץ: ${(getSuggestedHealthTax(taxBracket || 0.47) * 100).toFixed(1)}%`}
+              placeholder={`מומלץ: ${(getSuggestedHealthTax(taxBracket || 0.35) * 100).toFixed(1)}%`}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder:text-gray-400"
             />
             <p className="text-xs text-gray-500 mt-1">
-              מומלץ: {(getSuggestedHealthTax(taxBracket || 0.47) * 100).toFixed(1)}% לפי מדרגת המס
+              מומלץ: {(getSuggestedHealthTax(taxBracket || 0.35) * 100).toFixed(1)}% לפי מדרגת המס
             </p>
           </div>
         </div>
