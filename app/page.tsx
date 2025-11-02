@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 import ScenarioForm from "@/components/ScenarioForm";
 import ResultsCard from "@/components/ResultsCard";
 import CalculationHistory from "@/components/CalculationHistory";
@@ -26,6 +27,7 @@ export default function Home() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [savedScenario, setSavedScenario] = useState<ScenarioInput | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Load saved data and history on mount
   useEffect(() => {
@@ -231,152 +233,51 @@ export default function Home() {
     }
   };
 
-  const handleExportPDF = () => {
-    if (results) {
-      const { scenario, calculation } = results;
+  const handleExportPDF = async () => {
+    if (results && resultsRef.current) {
+      try {
+        // Show loading toast
+        toast.loading("יוצר PDF...", { id: "pdf-export" });
 
-      const doc = new jsPDF();
+        // Capture the results section as canvas
+        const canvas = await html2canvas(resultsRef.current, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#ffffff",
+        });
 
-      // Set font for Hebrew support (using built-in font)
-      let yPos = 20;
-      const lineHeight = 7;
-      const pageWidth = doc.internal.pageSize.getWidth();
+        // Calculate PDF dimensions
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      // Title
-      doc.setFontSize(16);
-      doc.text("Car Calculator - ", pageWidth / 2, yPos, { align: "center" });
-      yPos += lineHeight * 2;
+        // Create PDF
+        const pdf = new jsPDF({
+          orientation: imgHeight > imgWidth ? "portrait" : "portrait",
+          unit: "mm",
+          format: "a4",
+        });
 
-      // Scenario Name
-      doc.setFontSize(14);
-      doc.text(`Scenario: ${scenario.name}`, 20, yPos);
-      yPos += lineHeight * 2;
+        // Add image to PDF
+        const imgData = canvas.toDataURL("image/png");
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
-      // Input Data Section
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("Input Data", 20, yPos);
-      yPos += lineHeight;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
+        // Save PDF
+        const fileName = `חישוב-רכב-${results.scenario.name}-${new Date().toISOString().split('T')[0]}.pdf`;
+        pdf.save(fileName);
 
-      const inputLines = [
-        `Year: ${scenario.year}`,
-        `Type: ${scenario.powertrain === "electric" ? "Electric" : scenario.powertrain === "hybrid" ? "Hybrid" : "Gasoline"}`,
-        `Price: ${formatCurrency(scenario.price)}`,
-        `Financing Years: ${scenario.financeYears}`,
-        `APR: ${(scenario.apr * 100).toFixed(2)}%`,
-        `Annual KM: ${scenario.annualKm.toLocaleString()}`,
-        `Monthly Maintenance: ${formatCurrency(scenario.monthlyMaint)}`,
-        `Monthly Insurance: ${formatCurrency(scenario.monthlyInsurance)}`,
-        `Employer Allowance: ${formatCurrency(scenario.employerAllowance)}`,
-        `Tax Bracket: ${(scenario.taxBracket * 100).toFixed(0)}%`,
-        `National Insurance: ${(scenario.nationalInsurance * 100).toFixed(1)}%`,
-        `Health Tax: ${(scenario.healthTax * 100).toFixed(1)}%`,
-        `Analysis Period: ${scenario.horizonYears} years`,
-        `Residual Value: ${scenario.residualPct}%`,
-      ];
-
-      inputLines.forEach((line) => {
-        doc.text(line, 25, yPos);
-        yPos += lineHeight;
-      });
-
-      yPos += lineHeight;
-
-      // Personal Car Results
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("Personal Car Results", 20, yPos);
-      yPos += lineHeight;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-
-      const personalLines = [
-        `Gross Monthly Allowance: ${formatCurrency(scenario.employerAllowance)}`,
-        `Income Tax: -${formatCurrency(scenario.employerAllowance * scenario.taxBracket)}`,
-        `National Insurance: -${formatCurrency(scenario.employerAllowance * scenario.nationalInsurance)}`,
-        `Health Tax: -${formatCurrency(scenario.employerAllowance * scenario.healthTax)}`,
-        `Net Monthly Allowance: ${formatCurrency(calculation.monthlyAllowanceNet)}`,
-        ``,
-        `Monthly Costs:`,
-        `  Loan Payment: ${formatCurrency(calculation.monthlyPayment)}`,
-        `  Energy: ${formatCurrency(calculation.monthlyEnergy)}`,
-        `  Maintenance: ${formatCurrency(scenario.monthlyMaint)}`,
-        `  Insurance: ${formatCurrency(scenario.monthlyInsurance)}`,
-        `  Total Monthly Cost: ${formatCurrency(calculation.monthlyTotal)}`,
-        ``,
-        `Total Net Allowance: ${formatCurrency(calculation.totalAllowanceNet)}`,
-        `Total Costs: -${formatCurrency(calculation.monthlyTotal * calculation.totalMonths)}`,
-        `Residual Value: ${formatCurrency(calculation.residualValue)}`,
-        `Net Benefit: ${formatCurrency(calculation.netBenefit)}`,
-      ];
-
-      personalLines.forEach((line) => {
-        if (yPos > 270) {
-          doc.addPage();
-          yPos = 20;
-        }
-        doc.text(line, 25, yPos);
-        yPos += lineHeight;
-      });
-
-      yPos += lineHeight;
-
-      // Company Car Results
-      if (yPos > 250) {
-        doc.addPage();
-        yPos = 20;
+        toast.success("PDF הורד בהצלחה!", {
+          id: "pdf-export",
+          icon: "📄",
+          duration: 2000,
+        });
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast.error("שגיאה ביצירת PDF", {
+          id: "pdf-export",
+          duration: 3000,
+        });
       }
-
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("Company Car Results", 20, yPos);
-      yPos += lineHeight;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-
-      const companyLines = [
-        `Monthly Taxable Value: ${formatCurrency(calculation.companyCar.monthlyTaxableValue)}`,
-        `Monthly Tax Cost: ${formatCurrency(calculation.companyCar.monthlyTaxCost)}`,
-        `Total Tax Cost: ${formatCurrency(calculation.companyCar.totalTaxCost)}`,
-        `Net Cost: ${formatCurrency(calculation.companyCar.netCost)}`,
-      ];
-
-      companyLines.forEach((line) => {
-        doc.text(line, 25, yPos);
-        yPos += lineHeight;
-      });
-
-      yPos += lineHeight * 2;
-
-      // Comparison
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("Comparison", 20, yPos);
-      yPos += lineHeight;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-
-      const comparisonLines = [
-        `Difference: ${formatCurrency(calculation.comparison.difference)}`,
-        `Monthly Average Difference: ${formatCurrency(calculation.comparison.monthlyDifference)}`,
-        `Better Option: ${calculation.comparison.betterOption === "personal" ? "Personal Car" : "Company Car"}`,
-      ];
-
-      comparisonLines.forEach((line) => {
-        doc.text(line, 25, yPos);
-        yPos += lineHeight;
-      });
-
-      // Save PDF
-      const fileName = `car-calculation-${scenario.name}-${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
-
-      toast.success("PDF הורד בהצלחה!", {
-        icon: "📄",
-        duration: 2000,
-      });
     }
   };
 
@@ -509,7 +410,9 @@ export default function Home() {
                 </div>
               </motion.div>
             ) : results ? (
-              <ResultsCard key="results" scenario={results.scenario} results={results.calculation} />
+              <div ref={resultsRef}>
+                <ResultsCard key="results" scenario={results.scenario} results={results.calculation} />
+              </div>
             ) : (
               <motion.div
                 key="empty"
