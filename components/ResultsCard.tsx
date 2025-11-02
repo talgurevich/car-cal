@@ -237,52 +237,6 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
         </div>
       </div>
 
-      {/* Net Benefit Highlight */}
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        className={`relative overflow-hidden p-8 rounded-2xl ${
-          isProfitable
-            ? 'bg-gradient-to-br from-green-400 via-emerald-500 to-teal-500'
-            : 'bg-gradient-to-br from-red-400 via-rose-500 to-pink-500'
-        } shadow-2xl`}
-      >
-        <div className="absolute inset-0 bg-black/5"></div>
-        <div className="relative text-center">
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="text-white/90 font-medium mb-3 text-lg"
-          >
-            תועלת נטו לאחר {scenario.horizonYears} שנים
-          </motion.p>
-          <motion.p
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-            className="text-6xl font-black text-white mb-4 drop-shadow-lg"
-          >
-            {formatCurrency(Math.abs(results.netBenefit))}
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30"
-          >
-            <span className="text-2xl">{isProfitable ? '✓' : '✗'}</span>
-            <span className="text-white font-semibold text-base">
-              {isProfitable
-                ? 'לקיחת התוספת רווחית'
-                : 'רכב החברה עשוי להיות עדיף'
-              }
-            </span>
-          </motion.div>
-        </div>
-      </motion.div>
-
       {/* Monthly Breakdown */}
       <div className="bg-gray-50 rounded-xl p-6">
         <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
