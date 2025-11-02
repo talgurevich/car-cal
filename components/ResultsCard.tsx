@@ -130,13 +130,9 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
               <span className="text-gray-600 text-xs">מס בריאות ({(scenario.healthTax * 100).toFixed(1)}%):</span>
               <span className="font-semibold text-red-400 text-xs">-{formatCurrency(scenario.employerAllowance * scenario.healthTax)}</span>
             </div>
-            <div className="flex justify-between pb-2 border-b border-gray-300">
+            <div className="flex justify-between">
               <span className="text-gray-600 font-medium">תוספת נטו חודשית:</span>
               <span className="font-semibold text-green-600">+{formatCurrency(results.monthlyAllowanceNet)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">עלות חודשית:</span>
-              <span className="font-semibold text-red-600">-{formatCurrency(results.monthlyTotal)}</span>
             </div>
             <div className="flex justify-between pb-2 border-b border-gray-200">
               <span className="text-gray-500 text-xs italic">לעומת רכב חברה: חיסכון של</span>
@@ -145,6 +141,10 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
             <div className="flex justify-between pb-2 border-b border-gray-300">
               <span className="text-gray-600 font-medium">תוספת בפועל לאחר חיסכון:</span>
               <span className="font-semibold text-green-700">+{formatCurrency(results.monthlyAllowanceNet + results.companyCar.monthlyTaxCost)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">עלות חודשית:</span>
+              <span className="font-semibold text-red-600">-{formatCurrency(results.monthlyTotal)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">ערך הרכב אחרי ירידת ערך:</span>
