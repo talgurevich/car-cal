@@ -196,47 +196,6 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
         </div>
       </div>
 
-      {/* Company Car Calculation Explanation */}
-      <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl p-6">
-        <h3 className="font-semibold text-purple-900 mb-4 flex items-center gap-2">
-          <span className="text-xl">ℹ️</span>
-          איך מחושב שווי שימוש ברכב חברה?
-        </h3>
-        <div className="space-y-3 text-sm text-gray-700">
-          <p>
-            לפי רשות המיסים, שווי השימוש החודשי ברכב חברה הוא <strong>2.48%</strong> ממחיר הרכב (עד תקרה של ₪583,100 לשנת 2025).
-          </p>
-          {scenario.powertrain === "electric" && (
-            <p className="text-green-700 font-medium">
-              ✓ רכב חשמלי - הנחה חודשית של ₪1,350
-            </p>
-          )}
-          {scenario.powertrain === "hybrid" && (
-            <p className="text-blue-700 font-medium">
-              ✓ רכב היברידי - הנחה חודשית של ₪560
-            </p>
-          )}
-          <div className="bg-white p-3 rounded-lg">
-            <div className="text-xs text-gray-600 mb-2">חישוב:</div>
-            <div className="space-y-1 text-sm">
-              <div>מחיר הרכב: {formatCurrency(Math.min(scenario.price, 583100))}</div>
-              <div>שווי שימוש בסיס (2.48%): {formatCurrency(Math.min(scenario.price, 583100) * 0.0248)}</div>
-              {(scenario.powertrain === "electric" || scenario.powertrain === "hybrid") && (
-                <div className="text-green-600">
-                  הנחה: -{formatCurrency(scenario.powertrain === "electric" ? 1350 : 560)}
-                </div>
-              )}
-              <div className="font-bold pt-2 border-t">
-                שווי שימוש סופי: {formatCurrency(results.companyCar.monthlyTaxableValue)}
-              </div>
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 italic">
-            * מקור: מחשבון רשות המסים - https://secapp.taxes.gov.il/mm_usecar10/UseCarScreen.aspx
-          </p>
-        </div>
-      </div>
-
       {/* Monthly Breakdown */}
       <div className="bg-gray-50 rounded-xl p-6">
         <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">

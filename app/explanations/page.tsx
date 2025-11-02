@@ -239,6 +239,116 @@ export default function ExplanationsPage() {
           </div>
         </motion.div>
 
+        {/* Company Car Taxable Value Calculation */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+          className="mt-12"
+        >
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <span className="text-4xl">📐</span>
+            איך מחושב שווי שימוש ברכב חברה?
+          </h2>
+
+          <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl p-6 shadow-lg">
+            <div className="space-y-4">
+              <p className="text-gray-700 leading-relaxed">
+                לפי רשות המיסים, שווי השימוש החודשי ברכב חברה הוא <strong className="text-purple-700">2.48%</strong> ממחיר הרכב
+                (עד תקרה של <strong className="text-purple-700">₪583,100</strong> לשנת 2025).
+              </p>
+
+              <div className="bg-white rounded-lg p-4 space-y-3">
+                <h4 className="font-semibold text-gray-800">הנחות לפי סוג רכב:</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-600 font-bold">✓</span>
+                    <div>
+                      <strong className="text-green-700">רכב חשמלי:</strong> הנחה חודשית של ₪1,350
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-600 font-bold">✓</span>
+                    <div>
+                      <strong className="text-blue-700">רכב היברידי:</strong> הנחה חודשית של ₪560
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-gray-600 font-bold">•</span>
+                    <div>
+                      <strong className="text-gray-700">רכב בנזין:</strong> ללא הנחה
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-4">
+                <h4 className="font-semibold text-gray-800 mb-3">דוגמה לחישוב - רכב חשמלי במחיר ₪200,000:</h4>
+                <div className="space-y-2 text-sm font-mono">
+                  <div className="flex justify-between items-center pb-2">
+                    <span className="text-gray-700">מחיר הרכב:</span>
+                    <span className="font-semibold">₪200,000</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-2">
+                    <span className="text-gray-700">שווי שימוש בסיס (2.48%):</span>
+                    <span className="font-semibold">₪4,960</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                    <span className="text-green-700">הנחה רכב חשמלי:</span>
+                    <span className="font-semibold text-green-600">-₪1,350</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-gray-900 font-bold">שווי שימוש סופי:</span>
+                    <span className="font-bold text-purple-700 text-lg">₪3,610</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-4">
+                <h4 className="font-semibold text-gray-800 mb-3">דוגמה לחישוב - רכב בנזין במחיר ₪150,000:</h4>
+                <div className="space-y-2 text-sm font-mono">
+                  <div className="flex justify-between items-center pb-2">
+                    <span className="text-gray-700">מחיר הרכב:</span>
+                    <span className="font-semibold">₪150,000</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                    <span className="text-gray-700">שווי שימוש בסיס (2.48%):</span>
+                    <span className="font-semibold">₪3,720</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-gray-900 font-bold">שווי שימוש סופי:</span>
+                    <span className="font-bold text-purple-700 text-lg">₪3,720</span>
+                  </div>
+                  <p className="text-xs text-gray-500 italic mt-2">(ללא הנחה - רכב בנזין)</p>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h4 className="font-semibold text-yellow-900 mb-2 flex items-center gap-2">
+                  <span>💡</span>
+                  שימו לב:
+                </h4>
+                <p className="text-sm text-yellow-800">
+                  אם המעסיק מספק גם דלק או חשמל לרכב, יש להוסיף את שווי הדלק/חשמל לשווי השימוש החודשי.
+                  המחשבון הנוכחי מניח שאתה משלם בעצמך על האנרגיה.
+                </p>
+              </div>
+
+              <div className="text-xs text-gray-500 italic border-t pt-3">
+                <strong>מקור:</strong> מחשבון רשות המסים -
+                <a
+                  href="https://secapp.taxes.gov.il/mm_usecar10/UseCarScreen.aspx"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline mr-1"
+                >
+                  https://secapp.taxes.gov.il/mm_usecar10/UseCarScreen.aspx
+                </a>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Calculation Methodology */}
         <motion.div
           initial={{ opacity: 0 }}
