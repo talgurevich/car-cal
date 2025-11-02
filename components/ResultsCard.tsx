@@ -95,13 +95,13 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
           >
             <div className="inline-flex flex-col items-center gap-1 px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30">
               <span className="text-white font-medium text-sm opacity-90">
-                הבחירה המועדפת הינה
+                הבחירה המועדפת היא
               </span>
-              <span className="text-white font-bold text-xl">
-                {scenario.name}
+              <span className="text-white font-bold text-2xl">
+                {personalBetter ? 'רכב אישי + תוספת' : 'רכב חברה'}
               </span>
-              <span className="text-white/90 text-base">
-                שנתון {scenario.year} • {formatCurrency(scenario.price)}
+              <span className="text-white/90 text-sm mt-1">
+                עבור {scenario.name} • שנתון {scenario.year}
               </span>
             </div>
             <div className="inline-flex flex-col items-center gap-2 px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 mt-3">
