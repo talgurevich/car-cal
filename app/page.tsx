@@ -245,10 +245,10 @@ export default function Home() {
 
       // Input Data Section
       doc.setFontSize(12);
-      doc.setFont(undefined, "bold");
+      doc.setFont("helvetica", "bold");
       doc.text("Input Data", 20, yPos);
       yPos += lineHeight;
-      doc.setFont(undefined, "normal");
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
 
       const inputLines = [
@@ -277,10 +277,10 @@ export default function Home() {
 
       // Personal Car Results
       doc.setFontSize(12);
-      doc.setFont(undefined, "bold");
+      doc.setFont("helvetica", "bold");
       doc.text("Personal Car Results", 20, yPos);
       yPos += lineHeight;
-      doc.setFont(undefined, "normal");
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
 
       const personalLines = [
@@ -321,10 +321,10 @@ export default function Home() {
       }
 
       doc.setFontSize(12);
-      doc.setFont(undefined, "bold");
+      doc.setFont("helvetica", "bold");
       doc.text("Company Car Results", 20, yPos);
       yPos += lineHeight;
-      doc.setFont(undefined, "normal");
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
 
       const companyLines = [
@@ -343,10 +343,10 @@ export default function Home() {
 
       // Comparison
       doc.setFontSize(12);
-      doc.setFont(undefined, "bold");
+      doc.setFont("helvetica", "bold");
       doc.text("Comparison", 20, yPos);
       yPos += lineHeight;
-      doc.setFont(undefined, "normal");
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
 
       const comparisonLines = [
