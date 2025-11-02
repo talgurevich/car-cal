@@ -91,14 +91,27 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="inline-flex flex-col items-center gap-2 px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm border border-white/30"
+            className="space-y-3"
           >
-            <span className="text-white font-semibold text-lg">
-              יתרון של {formatCurrency(Math.abs(results.comparison.difference))}
-            </span>
-            <span className="text-white/80 text-sm">
-              (כ-{formatCurrency(Math.abs(results.comparison.monthlyDifference))} לחודש)
-            </span>
+            <div className="inline-flex flex-col items-center gap-1 px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30">
+              <span className="text-white font-medium text-sm opacity-90">
+                הבחירה המועדפת הינה
+              </span>
+              <span className="text-white font-bold text-xl">
+                {scenario.name}
+              </span>
+              <span className="text-white/90 text-base">
+                שנתון {scenario.year} • {formatCurrency(scenario.price)}
+              </span>
+            </div>
+            <div className="inline-flex flex-col items-center gap-2 px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 mt-3">
+              <span className="text-white font-semibold text-lg">
+                יתרון של {formatCurrency(Math.abs(results.comparison.difference))}
+              </span>
+              <span className="text-white/80 text-sm">
+                (כ-{formatCurrency(Math.abs(results.comparison.monthlyDifference))} לחודש)
+              </span>
+            </div>
           </motion.div>
         </div>
       </motion.div>
