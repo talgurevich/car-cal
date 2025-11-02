@@ -322,66 +322,6 @@ export default function ResultsCard({ scenario, results }: ResultsCardProps) {
         </div>
       </div>
 
-      {/* Calculation Formula */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6">
-        <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
-          <span className="text-xl">📐</span>
-          איך אנחנו מחשבים
-        </h3>
-
-        {/* The Equation */}
-        <div className="bg-white p-4 rounded-lg mb-4 shadow-sm">
-          <div className="text-center space-y-3">
-            <div className="text-sm font-medium text-gray-700">נוסחה:</div>
-            <div className="flex flex-wrap items-center justify-center gap-2 text-sm md:text-base">
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-lg font-semibold">Allowance × Months</span>
-              <span className="text-gray-500">−</span>
-              <span className="px-3 py-1 bg-red-100 text-red-700 rounded-lg font-semibold">Cost × Months</span>
-              <span className="text-gray-500">+</span>
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg font-semibold">Residual</span>
-            </div>
-          </div>
-        </div>
-
-        {/* With Actual Numbers */}
-        <div className="bg-white p-4 rounded-lg shadow-sm">
-          <div className="text-center space-y-3">
-            <div className="text-sm font-medium text-gray-700">החישוב שלך:</div>
-            <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
-              <span className="text-green-600 font-semibold">
-                {formatCurrency(scenario.employerAllowance)} × {results.totalMonths}
-              </span>
-              <span className="text-gray-500">−</span>
-              <span className="text-red-600 font-semibold">
-                {formatCurrency(results.monthlyTotal)} × {results.totalMonths}
-              </span>
-              <span className="text-gray-500">+</span>
-              <span className="text-blue-600 font-semibold">
-                {formatCurrency(results.residualValue)}
-              </span>
-            </div>
-            <div className="text-gray-400 text-xs">=</div>
-            <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
-              <span className="text-green-600 font-semibold">
-                {formatCurrency(scenario.employerAllowance * results.totalMonths)}
-              </span>
-              <span className="text-gray-500">−</span>
-              <span className="text-red-600 font-semibold">
-                {formatCurrency(results.monthlyTotal * results.totalMonths)}
-              </span>
-              <span className="text-gray-500">+</span>
-              <span className="text-blue-600 font-semibold">
-                {formatCurrency(results.residualValue)}
-              </span>
-            </div>
-            <div className="text-gray-400 text-xs">=</div>
-            <div className={`text-2xl font-bold ${isProfitable ? 'text-green-700' : 'text-red-700'}`}>
-              {formatCurrency(results.netBenefit)}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Detailed Breakdown */}
       <details className="group">
         <summary className="cursor-pointer list-none">

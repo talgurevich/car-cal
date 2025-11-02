@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import ScenarioForm from "@/components/ScenarioForm";
 import ResultsCard from "@/components/ResultsCard";
 import CalculationHistory from "@/components/CalculationHistory";
 import { ScenarioInput, calculateScenario, CalculationResult } from "@/lib/formulas";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
-import { Save, Download, Upload } from "lucide-react";
+import { Save, Download, Upload, BookOpen } from "lucide-react";
 
 interface HistoryItem {
   scenario: ScenarioInput;
@@ -170,6 +171,25 @@ export default function Home() {
           >
             קבלו החלטה מושכלת: האם לקחת את <span className="font-semibold text-blue-600">תוספת המעסיק</span> או להשאיר את <span className="font-semibold text-purple-600">רכב החברה</span>?
           </motion.p>
+
+          {/* Explanations Link */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mt-6"
+          >
+            <Link href="/explanations">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white/90 backdrop-blur-sm text-gray-700 rounded-xl shadow-md hover:shadow-lg transition-all border border-gray-200 hover:border-purple-300"
+              >
+                <BookOpen size={20} />
+                <span className="font-medium">הסברים ופרטים על החישובים</span>
+              </motion.button>
+            </Link>
+          </motion.div>
 
           {/* Action Buttons */}
           {results && (
