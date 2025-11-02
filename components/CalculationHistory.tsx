@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ScenarioInput, CalculationResult, formatCurrency } from "@/lib/formulas";
-import { History, TrendingUp, TrendingDown } from "lucide-react";
+import { History, TrendingUp, TrendingDown, Trash2 } from "lucide-react";
 
 interface HistoryItem {
   scenario: ScenarioInput;
@@ -13,9 +13,10 @@ interface HistoryItem {
 interface CalculationHistoryProps {
   history: HistoryItem[];
   onLoadScenario: (scenario: ScenarioInput) => void;
+  onClearHistory: () => void;
 }
 
-export default function CalculationHistory({ history, onLoadScenario }: CalculationHistoryProps) {
+export default function CalculationHistory({ history, onLoadScenario, onClearHistory }: CalculationHistoryProps) {
   if (history.length === 0) {
     return null;
   }
@@ -28,11 +29,22 @@ export default function CalculationHistory({ history, onLoadScenario }: Calculat
       className="mt-16 mb-8"
     >
       <div className="bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/20">
-        <div className="flex items-center gap-3 mb-6 border-b border-gray-200 pb-4">
-          <History className="w-6 h-6 text-purple-600" />
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            חישובים אחרונים
-          </h2>
+        <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-4">
+          <div className="flex items-center gap-3">
+            <History className="w-6 h-6 text-purple-600" />
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              חישובים אחרונים
+            </h2>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onClearHistory}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+          >
+            <Trash2 size={16} />
+            <span>נקה היסטוריה</span>
+          </motion.button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

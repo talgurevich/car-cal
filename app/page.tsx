@@ -118,6 +118,15 @@ export default function Home() {
     }
   };
 
+  const handleClearHistory = () => {
+    localStorage.removeItem("carCalculatorHistory");
+    setHistory([]);
+    toast.success("ההיסטוריה נמחקה!", {
+      icon: "🗑️",
+      duration: 2000,
+    });
+  };
+
   const handleExport = () => {
     if (results) {
       const { scenario, calculation } = results;
@@ -539,7 +548,7 @@ export default function Home() {
       </div>
 
       {/* History Section */}
-      <CalculationHistory history={history} onLoadScenario={handleLoadScenario} />
+      <CalculationHistory history={history} onLoadScenario={handleLoadScenario} onClearHistory={handleClearHistory} />
 
       {/* Footer Info */}
       <motion.div
