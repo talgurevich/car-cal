@@ -60,6 +60,11 @@ export function calculateMonthlyPayment(
   years: number,
   principal: number
 ): number {
+  // If no financing (cash purchase), no monthly payment
+  if (years === 0) {
+    return 0;
+  }
+
   const r = apr / 12;
   const n = years * 12;
 

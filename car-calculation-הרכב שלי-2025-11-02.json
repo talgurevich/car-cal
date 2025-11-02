@@ -1,0 +1,47 @@
+{
+  "scenario": {
+    "name": "הרכב שלי",
+    "year": 2025,
+    "powertrain": "electric",
+    "price": 200000,
+    "financeYears": 5,
+    "apr": 0.05,
+    "annualKm": 20000,
+    "kwhPer100": 15,
+    "kmPerLiter": 15,
+    "elecHomePrice": 0.5,
+    "elecPublicPrice": 1.5,
+    "homeChargeShare": 0.8,
+    "fuelPrice": 7,
+    "monthlyMaint": 500,
+    "monthlyInsurance": 300,
+    "residualPct": 40,
+    "employerAllowance": 3000,
+    "horizonYears": 3,
+    "taxBracket": 0.47,
+    "nationalInsurance": 0.07,
+    "healthTax": 0.05,
+    "companyCarTaxableValue": null
+  },
+  "calculation": {
+    "monthlyPayment": 3774.2467288021985,
+    "monthlyEnergy": 175,
+    "monthlyTotal": 4749.246728802198,
+    "residualValue": 80000,
+    "netBenefit": -46692.882236879144,
+    "totalMonths": 36,
+    "monthlyAllowanceNet": 1229.9999999999998,
+    "totalAllowanceNet": 44279.99999999999,
+    "companyCar": {
+      "monthlyTaxableValue": null,
+      "monthlyTaxCost": null,
+      "totalTaxCost": null,
+      "netCost": null
+    },
+    "comparison": {
+      "difference": null,
+      "betterOption": "company",
+      "monthlyDifference": null
+    }
+  }
+}

@@ -234,50 +234,139 @@ export default function Home() {
   };
 
   const handleExportPDF = async () => {
-    if (results && resultsRef.current) {
-      try {
-        // Show loading toast
-        toast.loading("יוצר PDF...", { id: "pdf-export" });
+    if (!results || !resultsRef.current) {
+      toast.error("אין תוצאות לייצא", {
+        duration: 2000,
+      });
+      return;
+    }
 
-        // Capture the results section as canvas
-        const canvas = await html2canvas(resultsRef.current, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: "#ffffff",
+    try {
+      // Show loading toast
+      toast.loading("יוצר PDF...", { id: "pdf-export" });
+
+      // Wait a bit for any animations to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Clone the element to avoid modifying the original
+      const elementToCapture = resultsRef.current.cloneNode(true) as HTMLElement;
+
+      // Temporarily add to document (hidden) so styles are computed
+      elementToCapture.style.position = 'absolute';
+      elementToCapture.style.left = '-9999px';
+      elementToCapture.style.top = '0';
+      document.body.appendChild(elementToCapture);
+
+      // Force reflow to ensure styles are computed
+      elementToCapture.offsetHeight;
+
+      // Replace all inline and computed styles with RGB equivalents
+      const replaceColors = (element: HTMLElement) => {
+        const walker = document.createTreeWalker(
+          element,
+          NodeFilter.SHOW_ELEMENT,
+          null
+        );
+
+        const elements: HTMLElement[] = [];
+        let node;
+        while (node = walker.nextNode()) {
+          elements.push(node as HTMLElement);
+        }
+
+        elements.forEach((el) => {
+          const computedStyle = window.getComputedStyle(el);
+
+          // Copy all relevant computed styles as inline styles
+          const stylesToCopy = [
+            'backgroundColor', 'color', 'borderColor', 'borderTopColor',
+            'borderRightColor', 'borderBottomColor', 'borderLeftColor',
+            'outlineColor', 'fill', 'stroke'
+          ];
+
+          stylesToCopy.forEach(prop => {
+            const value = computedStyle[prop as any];
+            if (value && value !== 'rgba(0, 0, 0, 0)' && value !== 'transparent') {
+              (el.style as any)[prop] = value;
+            }
+          });
+
+          // Also copy background images and gradients
+          if (computedStyle.backgroundImage && computedStyle.backgroundImage !== 'none') {
+            el.style.backgroundImage = computedStyle.backgroundImage;
+          }
         });
+      };
 
-        // Calculate PDF dimensions
-        const imgWidth = 210; // A4 width in mm
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      replaceColors(elementToCapture);
 
-        // Create PDF
-        const pdf = new jsPDF({
-          orientation: imgHeight > imgWidth ? "portrait" : "portrait",
-          unit: "mm",
-          format: "a4",
-        });
+      // Capture the cloned element as canvas
+      const canvas = await html2canvas(elementToCapture, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        allowTaint: true,
+        foreignObjectRendering: false,
+        onclone: (clonedDoc) => {
+          // Additional cleanup in the cloned document
+          const clonedElement = clonedDoc.querySelector('[style*="position: absolute"]');
+          if (clonedElement) {
+            (clonedElement as HTMLElement).style.position = 'relative';
+            (clonedElement as HTMLElement).style.left = '0';
+          }
+        }
+      });
 
-        // Add image to PDF
-        const imgData = canvas.toDataURL("image/png");
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      // Remove the cloned element
+      document.body.removeChild(elementToCapture);
 
-        // Save PDF
-        const fileName = `חישוב-רכב-${results.scenario.name}-${new Date().toISOString().split('T')[0]}.pdf`;
-        pdf.save(fileName);
+      // Calculate PDF dimensions
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        toast.success("PDF הורד בהצלחה!", {
-          id: "pdf-export",
-          icon: "📄",
-          duration: 2000,
-        });
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        toast.error("שגיאה ביצירת PDF", {
-          id: "pdf-export",
-          duration: 3000,
-        });
+      // Determine if we need multiple pages
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      // Convert canvas to image
+      const imgData = canvas.toDataURL("image/png");
+
+      // Add first page
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add additional pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
       }
+
+      // Save PDF
+      const fileName = `חישוב-רכב-${results.scenario.name}-${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+
+      toast.success("PDF הורד בהצלחה!", {
+        id: "pdf-export",
+        icon: "📄",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error(`שגיאה ביצירת PDF: ${error instanceof Error ? error.message : 'שגיאה לא ידועה'}`, {
+        id: "pdf-export",
+        duration: 4000,
+      });
     }
   };
 

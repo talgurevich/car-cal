@@ -216,9 +216,13 @@ export default function ScenarioForm({ onSubmit, defaultValues }: ScenarioFormPr
             </label>
             <input
               type="number"
-              {...register("financeYears", { required: true, valueAsNumber: true })}
+              min="0"
+              {...register("financeYears", { required: true, min: 0, valueAsNumber: true })}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              הזן 0 לרכישה במזומן (ללא מימון)
+            </p>
           </div>
 
           <div>
