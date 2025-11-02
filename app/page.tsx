@@ -65,6 +65,9 @@ export default function Home() {
   }, [results]);
 
   const handleCalculate = (data: ScenarioInput) => {
+    // Scroll to top immediately
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     setIsCalculating(true);
     // Simulate calculation delay for better UX
     setTimeout(() => {
